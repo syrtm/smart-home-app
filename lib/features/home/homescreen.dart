@@ -36,7 +36,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   @override
   void initState() {
     super.initState();
-    _loadDataFromFile();
+    _loadDataFromFile(); // Uygulama başlatıldığında veri dosyasından verileri yükler
   }
 
   Future<void> _loadDataFromFile() async {
@@ -46,7 +46,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     String dataString = await rootBundle.loadString('assets/data.json');
     final Map<String, dynamic> dataJson = json.decode(dataString);
 
-    // Veritabanına kaydet
+    // Veritabanını temizle ve yeni verileri ekle
+    await dbHelper.clearTable(); // Tabloyu temizler
     await dbHelper.insert({
       'temperature': dataJson['sensor_data']['temperature'],
       'sound': dataJson['sensor_data']['sound'],
@@ -156,7 +157,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 ),
               ),
               ElevatedButton(
-                onPressed: _fetchData,
+                onPressed: _loadDataFromFile, // Veri dosyasından güncelleme
                 child: Text('Verileri Güncelle'),
               ),
               ElevatedButton(

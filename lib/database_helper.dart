@@ -57,4 +57,9 @@ class DatabaseHelper {
     }
     return {};
   }
+
+  Future<void> clearTable() async {
+    Database db = await instance.database;
+    await db.delete(table);
+  }
 }
