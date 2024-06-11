@@ -15,6 +15,9 @@ import 'package:smart_home/router/router.dart';
 import 'package:smart_home/features/home/controller/temperature_controller.dart';
 import 'package:smart_home/features/home/model/temperature_model.dart';
 import 'package:smart_home/features/home/temperature_screen.dart';
+import 'package:smart_home/database_helper.dart'; // Yeni dosyayı import edin
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 
 class HomeScreenView extends StatefulWidget {
   const HomeScreenView({super.key});
@@ -25,6 +28,49 @@ class HomeScreenView extends StatefulWidget {
 
 class _HomeScreenViewState extends State<HomeScreenView> {
   var model_list = Controller().model_list;
+  double temperature = 0.0;
+  double sound = 0.0;
+  double brightness = 0.0;
+  int userCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDataFromFile();
+  }
+
+  Future<void> _loadDataFromFile() async {
+    final dbHelper = DatabaseHelper.instance;
+
+    // JSON dosyasını oku
+    String dataString = await rootBundle.loadString('assets/data.json');
+    final Map<String, dynamic> dataJson = json.decode(dataString);
+
+    // Veritabanına kaydet
+    await dbHelper.insert({
+      'temperature': dataJson['sensor_data']['temperature'],
+      'sound': dataJson['sensor_data']['sound'],
+      'brightness': dataJson['sensor_data']['brightness'],
+      'user_count': dataJson['sensor_data']['user_count'],
+    });
+
+    // Verileri güncelle
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    final dbHelper = DatabaseHelper.instance;
+    Map<String, dynamic> latestData = await dbHelper.queryLatest();
+
+    if (latestData.isNotEmpty) {
+      setState(() {
+        temperature = latestData['temperature'] ?? 0.0;
+        sound = latestData['sound'] ?? 0.0;
+        brightness = latestData['brightness'] ?? 0.0;
+        userCount = latestData['user_count'] ?? 0;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +156,10 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 ),
               ),
               ElevatedButton(
+                onPressed: _fetchData,
+                child: Text('Verileri Güncelle'),
+              ),
+              ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -117,6 +167,17 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                   );
                 },
                 child: Text('Sıcaklık Verilerini Görüntüle'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    Text('Sıcaklık: $temperature °C', style: GoogleFonts.roboto(fontSize: 16, color: Colors.white)),
+                    Text('Ses: $sound dB', style: GoogleFonts.roboto(fontSize: 16, color: Colors.white)),
+                    Text('Parlaklık: $brightness %', style: GoogleFonts.roboto(fontSize: 16, color: Colors.white)),
+                    Text('Kullanıcı Sayısı: $userCount', style: GoogleFonts.roboto(fontSize: 16, color: Colors.white)),
+                  ],
+                ),
               ),
             ],
           ),
