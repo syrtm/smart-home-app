@@ -22,7 +22,7 @@ class Controller {
             detail_mode: "Mode",
             detail_modename: "POWER FULL",
             model1:
-                CustomModel(icon: Icons.coronavirus, value: "COLD", flag: true),
+            CustomModel(icon: Icons.coronavirus, value: "COLD", flag: true),
             model2: CustomModel(icon: Icons.air, value: "FAN", flag: false),
             model3: CustomModel(
                 icon: Icons.water_drop_outlined, value: "DRY", flag: false),
@@ -42,7 +42,7 @@ class Controller {
             detail_mode: "Mode",
             detail_modename: "Balance",
             model1:
-                CustomModel(icon: Icons.speaker, value: "Volume", flag: false),
+            CustomModel(icon: Icons.speaker, value: "Volume", flag: false),
             model2: CustomModel(
                 icon: Icons.surround_sound, value: "SURROUND", flag: false),
             model3: CustomModel(
@@ -90,4 +90,11 @@ class Controller {
                 flag: false),
             value: 5)),
   ];
+
+  void updateModelValues(Map<String, dynamic> sensorData) {
+    model_list[0].model.value = sensorData['temperature'];
+    model_list[1].model.value = sensorData['sound'];
+    model_list[2].model.value = sensorData['brightness'];
+    model_list[3].model.value = sensorData['user_count'];
+  }
 }

@@ -32,6 +32,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   double sound = 0.0;
   double brightness = 0.0;
   int userCount = 0;
+  final controller = Controller();
 
   @override
   void initState() {
@@ -70,6 +71,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
         brightness = latestData['brightness'] ?? 0.0;
         userCount = latestData['user_count'] ?? 0;
       });
+
+      // Controller sınıfında verileri güncelle
+      controller.updateModelValues(latestData);
     }
   }
 
@@ -157,7 +161,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 ),
               ),
               ElevatedButton(
-                onPressed: _loadDataFromFile, // Veri dosyasından güncelleme
+                onPressed: _fetchData,
                 child: Text('Verileri Güncelle'),
               ),
               ElevatedButton(
